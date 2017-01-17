@@ -126,7 +126,7 @@ struct socket
 
     //Declaring functions for publish
     void (* publishint)(char *,int);
-    void (* publishsring)(char *,char *);
+    void (* publishstring)(char *,char *);
     void (* publishobject)(char *,json_object *);
 
     //Declaring functions for publish events along with ack
@@ -177,7 +177,7 @@ struct socket * Socket(char *protocol,char *address,int port,char *path,char *pr
     s->unsubscribe_ack=&_unsubscribe_ack;
 
     s->publishint=&_publishint;
-    s->publishsring=&_publishstring;
+    s->publishstring=&_publishstring;
     s->publishobject=&_publishobject;
 
     s->publishintack=&_publishint_ack;
