@@ -231,7 +231,7 @@ static int websocket_write_back(struct lws *wsi_in, char *str, int str_size_in)
     //* write out*/
     n = lws_write(wsi_in, out + LWS_SEND_BUFFER_PRE_PADDING, len, LWS_WRITE_TEXT);
 
-    printf(KBLU"[websocket_write_back] %s\n"RESET, str);
+    // printf(KBLU"[websocket_write_back] %s\n"RESET, str);
     //* free the buffer*/
     free(out);
 
@@ -254,7 +254,7 @@ static int ws_service_callback(
     switch (reason) {
 
         case LWS_CALLBACK_CLIENT_ESTABLISHED:{
-            printf(KYEL"[Main Service] Connect with server success.\n"RESET);
+            // printf(KYEL"[Main Service] Connect with server success.\n"RESET);
             json_object * jobj = json_object_new_object();
             json_object *event = json_object_new_string("#handshake");
             json_object * authobject = json_object_new_object();
@@ -272,7 +272,7 @@ static int ws_service_callback(
             }
             
             char * data = (char *)json_object_to_json_string(jobj);
-            printf ("The json object created: %sn",json_object_to_json_string(jobj));
+            // printf ("The json object created: %sn",json_object_to_json_string(jobj));
             // "{\"event\": \"#handshake\",\"data\": {\"authToken\":null},\"cid\":1}"
             websocket_write_back(wsi, data, -1);
             if (s->connect_callback!=NULL) {
@@ -285,7 +285,7 @@ static int ws_service_callback(
 
         case LWS_CALLBACK_CLIENT_CONNECTION_ERROR:{
             if (s->connect_error_callback!=NULL) s->connect_error_callback(s);
-            printf(KRED"[Main Service] Connect with server error.\n"RESET);
+            // printf(KRED"[Main Service] Connect with server error.\n"RESET);
             destroy_flag = 1;
             connection_flag = 0;
         }
@@ -293,7 +293,7 @@ static int ws_service_callback(
 
         case LWS_CALLBACK_CLOSED:{
             if (s->disconnect_callback!=NULL) s->disconnect_callback(s);
-            printf(KYEL"[Main Service] LWS_CALLBACK_CLOSED\n"RESET);
+            // printf(KYEL"[Main Service] LWS_CALLBACK_CLOSED\n"RESET);
             destroy_flag = 1;
             connection_flag = 0;
         }    
@@ -303,7 +303,7 @@ static int ws_service_callback(
             if (strcmp((char *)in,"#1")==0){
                 websocket_write_back(wsi, (char *) "#2", -1);    
             }else{
-                printf(KCYN_L"[Main Service] Client recvived:%s\n"RESET, (char *)in);
+                // printf(KCYN_L"[Main Service] Client recvived:%s\n"RESET, (char *)in);
                 // printf("UNDER MESSAGE GOT CALLED");
                 char * channel;
                 json_object * data;
@@ -334,33 +334,34 @@ static int ws_service_callback(
                     // printf("id is %s",s->id );
                     break;
                     case PUBLISH:
-                    printf("Publish got called");
+                    // printf("Publish got called");
                     handle_publish(channel,data);
 
                     break;
                     case REMOVETOKEN:
-                    printf("Removetoken got called");
+                    // printf("Removetoken got called");
                     s->token=NULL;
                     break;
                     case SETTOKEN:
-                    printf("Set token got called");
+                    // printf("Set token got called");
                     if (s->onauthtoken_callback!=NULL) s->onauthtoken_callback(s,s->token);
                     break;
                     case EVENT:
-                    printf("Event got called");
+                    // printf("Event got called");
                     handle_emit(_recv->event,_recv->data);
                     handle_emit_ack(getackobject(_recv->event,_recv->cid),_recv->data,&_Ack);
                     break;
-                    case ACKRECEIVE:
-                    printf("Ack receive got called");
+                    case ACKRECEIVE:{
+                    // printf("Ack receive got called");
 
                     struct ackobject *ackobj;
                     int error = hashmap_get(acks, _recv->rid, (void**)(&ackobj));
-                    if (error==MAP_OK){
-                        hashmap_remove(acks,_recv->rid);
-                        ackobj->listener(ackobj->event,_recv->error,_recv->data);
+                        if (error==MAP_OK){
+                             hashmap_remove(acks,_recv->rid);
+                            ackobj->listener(ackobj->event,_recv->error,_recv->data);
+                        }
+                        break;
                     }
-                    break;
 
                 }
                 // if (_recv->rid!=-1) 
@@ -380,7 +381,7 @@ static int ws_service_callback(
         }
             break;
         case LWS_CALLBACK_CLIENT_WRITEABLE :{
-            printf(KYEL"[Main Service] On writeable is called. send byebye message\n"RESET);
+            // printf(KYEL"[Main Service] On writeable is called. send byebye message\n"RESET);
             websocket_write_back(wsi, (char *)"Byebye! See you later", -1);
             writeable_flag = 1;
         }    
@@ -395,34 +396,7 @@ static int ws_service_callback(
 
 static void *pthread_routine(void *data)
 {
-    
-    // struct pthread_routine_tool *tool = (struct pthread_routine_tool *)tool_in;
-
-    // printf(KBRN"[pthread_routine] Good day. This is pthread_routine.\n"RESET);
-
-    // //* waiting for connection with server done.*/
-    // while(!connection_flag)
-    //     usleep(1000*20);
-
-    printf("Thread got called");
     websocket_write_back(wsi, (char *)data, -1);
-    // websocket_write_back(wsi, data, -1);
-    // websocket_write_back(wsi, data, -1);
-    // websocket_write_back(wsi, data, -1);  
-
-    // //*Send greeting to server*/
-    // printf(KBRN"[pthread_routine] Server is ready. send a greeting message to server.\n"RESET); 
-    // websocket_write_back(tool->wsi,(char *) "Good day", -1);
-
-    // printf(KBRN"[pthread_routine] sleep 2 seconds then call onWritable\n"RESET);
-    // sleep(1);
-    // printf(KBRN"------------------------------------------------------\n"RESET);
-    // sleep(1);
-    // //printf(KBRN"[pthread_routine] sleep 2 seconds then call onWritable\n"RESET);
-
-    // //*involked wriable*/
-    // printf(KBRN"[pthread_routine] call on writable.\n"RESET);   
-    // lws_callback_on_writable(tool->wsi);
 
 }
 
