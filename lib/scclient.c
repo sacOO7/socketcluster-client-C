@@ -144,7 +144,7 @@ struct socket
 // struct socket * s;
 
 
-struct socket * _socket(char *protocol,char *address,int port,char *path,char *proxy_address,int proxy_port){
+struct socket * Socket(char *protocol,char *address,int port,char *path,char *proxy_address,int proxy_port){
     s=(struct socket *)malloc(sizeof(struct socket));
     s->id=NULL;
     s->address=address;
@@ -405,7 +405,6 @@ static void *pthread_routine(void *data)
     //     usleep(1000*20);
 
     printf("Thread got called");
-    sleep(1);
     websocket_write_back(wsi, (char *)data, -1);
     // websocket_write_back(wsi, data, -1);
     // websocket_write_back(wsi, data, -1);

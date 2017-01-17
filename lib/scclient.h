@@ -1,3 +1,8 @@
+
+#ifndef __SCCLIENT_H__
+#define __SCCLIENT_H__
+
+
 enum parseresult {
 	ISAUTHENTICATED,
 	PUBLISH,
@@ -68,3 +73,5 @@ struct ackobject
     char *event;
     void (* listener)(char * event,json_object *error,json_object *data);
 };
+
+#endif
