@@ -84,6 +84,13 @@ static struct recv_message * get_message_object(){
 }
 
 
+void _allowselfsigned(){
+    if (use_ssl==LCCSCF_USE_SSL){
+    use_ssl=LCCSCF_USE_SSL |
+            LCCSCF_ALLOW_SELFSIGNED |
+            LCCSCF_SKIP_SERVER_CERT_HOSTNAME_CHECK;
+    }
+}
 
 struct socket
 {
@@ -99,6 +106,7 @@ struct socket
 
 
     //Declaring function pointers to set of callbacks
+    void (* allowselfsigned)();
     void (* connect_callback)(struct socket *);
     void (* disconnect_callback)(struct socket *);
     void (* connect_error_callback)(struct socket *);
@@ -154,8 +162,8 @@ struct socket * Socket(char *protocol,char *address,int port,char *path,char *pr
     s->proxy_address=proxy_address;
     s->proxy_port=proxy_port;
 
-    if(strcmp(protocol,"ws")!=0){
-        use_ssl=1;
+    if(strcmp(protocol,"wss")==0  || strcmp(protocol,"https")==0){
+        use_ssl=LCCSCF_USE_SSL;
     }
 
     s->connect=&socket_connect;
@@ -187,6 +195,7 @@ struct socket * Socket(char *protocol,char *address,int port,char *path,char *pr
     s->on=&_on;
     s->onack=&_onack;
     s->onpublish=&_onpublish;
+    s->allowselfsigned=&_allowselfsigned;
 
 
     s->connect_callback=NULL;
