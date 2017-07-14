@@ -11,3 +11,5 @@ Libwebsockets is a lightweight pure C library built to use minimal CPU and memor
 Json-c is one of the most performant and easy-to-use JSON implementations in c. To use json-c objects in client follow [tutorials on json-c](https://linuxprograms.wordpress.com/2010/05/20/json-c-libjson-tutorial/).
 
 More contributions are always welcome :)
+
+More documentation coming soon..
