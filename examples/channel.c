@@ -10,16 +10,16 @@ void _sub_callback(char * channelname,json_object *error,json_object *data){
 void _pub_callback(char * channelname,json_object *error,json_object *data){
     if (error==NULL){
         printf("\nPublished successfully to channel %s",channelname);
-    }   
+    }
 }
 
 void _connect(struct socket * s)
 {
     printf("successfully connected");
-    s->subscribe_ack("yell",&_sub_callback);
+    s->subscribe_ack((char *)"yell",&_sub_callback);
     int a;
     scanf("%d",&a);
-    s->publishintack("yell",4,&_pub_callback);
+    s->publishintack((char *)"yell",4,&_pub_callback);
     // s->publishstring("yell","Is anyone here?");
 
 
@@ -50,15 +50,18 @@ void on_set_auth_token(struct socket * s,char * token)
 
 int main()
 {
-     
+
     s=Socket((char *)"ws",(char *)"localhost",8000,(char *)"/socketcluster/",NULL,-1);
     s->connect_callback=&_connect;
     s->disconnect_callback=&disconnect;
-    s->connect_error_callback=&connect_error;    
+    s->connect_error_callback=&connect_error;
     s->onauth_callback=&on_auth;
     s->onauthtoken_callback=&on_set_auth_token;
-    s->onpublish("yell",&onyell);
+    s->onpublish((char *)"yell",&onyell);
+
     s->connect();
+    printf("POST");
+
     // s1->disconnect();
 }
 

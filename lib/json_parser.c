@@ -18,6 +18,12 @@ void print_json_value(json_object *jobj){
     case json_type_string: printf("json_type_stringn");
                          printf("          value: %sn", json_object_get_string(jobj));
                          break;
+    case json_type_object: printf("json_type_object");
+                         break;
+    case json_type_array: printf("json_type_array");
+                         break;
+    case json_type_null: printf("json_type_null");
+                         break;
   }
 
 }
@@ -79,18 +85,18 @@ void json_parse(json_object * jobj,struct recv_message * recv) {
       // printf("error is %s", recv->error);
     }
     // switch (type) {
-    //   case json_type_boolean: 
-    //   case json_type_double: 
-    //   case json_type_int: 
+    //   case json_type_boolean:
+    //   case json_type_double:
+    //   case json_type_int:
     //   case json_type_string: print_json_value(val);
-    //                        break; 
+    //                        break;
     //   case json_type_object: printf("json_type_objectn");
     //                        jobj = json_object_object_get(jobj, key);
-    //                        json_parse(jobj,recv); 
+    //                        json_parse(jobj,recv);
     //                        break;
     //   case json_type_array: printf("type: json_type_array, ");
     //                       json_parse_array(jobj, key,recv);
     //                       break;
     // }
   }
-} 
+}
