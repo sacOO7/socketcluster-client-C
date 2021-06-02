@@ -72,7 +72,7 @@ static void INT_HANDLER(int signo) {
     destroy_flag = 1;
 }
 
-//register the signal SIGINT handler 
+//register the signal SIGINT handler
 static struct recv_message * get_message_object(){
     struct recv_message *recv=(struct recv_message *)malloc(sizeof(struct recv_message));
     recv->rid=-1;
@@ -119,7 +119,7 @@ struct socket
     void (* emitobject)(char *,json_object *);
 
     //Declaring functions for sending and receiving events along with ack
-    void (* emitintack)(char *,int,void (*f)(char *,json_object *,json_object *));   
+    void (* emitintack)(char *,int,void (*f)(char *,json_object *,json_object *));
     void (* emitstringack)(char *,char *,void (*f)(char *,json_object *,json_object *));
     void (* emitobjectack)(char *,json_object *,void (*f)(char *,json_object *,json_object *));
 
@@ -138,7 +138,7 @@ struct socket
     void (* publishobject)(char *,json_object *);
 
     //Declaring functions for publish events along with ack
-    void (* publishintack)(char *,int,void (*f)(char *,json_object *,json_object *));   
+    void (* publishintack)(char *,int,void (*f)(char *,json_object *,json_object *));
     void (* publishstringack)(char *,char *,void (*f)(char *,json_object *,json_object *));
     void (* publishobjectack)(char *,json_object *,void (*f)(char *,json_object *,json_object *));
 
@@ -220,7 +220,7 @@ struct pthread_routine_tool {
     struct lws *wsi;
 };
 
-static int websocket_write_back(struct lws *wsi_in, char *str, int str_size_in) 
+static int websocket_write_back(struct lws *wsi_in, char *str, int str_size_in)
 {
     if (str == NULL || wsi_in == NULL)
         return -1;
@@ -229,7 +229,7 @@ static int websocket_write_back(struct lws *wsi_in, char *str, int str_size_in)
     int len;
     unsigned char *out = NULL;
 
-    if (str_size_in < 1) 
+    if (str_size_in < 1)
         len = strlen(str);
     else
         len = str_size_in;
@@ -279,7 +279,7 @@ static int ws_service_callback(
             json_object_object_add(jobj,"data",NULL);
             json_object_object_add(jobj,"cid",cid);
             }
-            
+
             char * data = (char *)json_object_to_json_string(jobj);
             // printf ("The json object created: %sn",json_object_to_json_string(jobj));
             // "{\"event\": \"#handshake\",\"data\": {\"authToken\":null},\"cid\":1}"
@@ -287,7 +287,7 @@ static int ws_service_callback(
             if (s->connect_callback!=NULL) {
                 s->connect_callback(s);
             }
-            
+
             connection_flag = 1;
         }
             break;
@@ -305,12 +305,12 @@ static int ws_service_callback(
             // printf(KYEL"[Main Service] LWS_CALLBACK_CLOSED\n"RESET);
             destroy_flag = 1;
             connection_flag = 0;
-        }    
+        }
             break;
 
         case LWS_CALLBACK_CLIENT_RECEIVE:{
             if (strcmp((char *)in,"#1")==0){
-                websocket_write_back(wsi, (char *) "#2", -1);    
+                websocket_write_back(wsi, (char *) "#2", -1);
             }else{
                 // printf(KCYN_L"[Main Service] Client recvived:%s\n"RESET, (char *)in);
                 // printf("UNDER MESSAGE GOT CALLED");
@@ -336,10 +336,10 @@ static int ws_service_callback(
                             }
                     }
                 }
-                
+
                 switch(result){
                     case ISAUTHENTICATED:
-                    if (s->onauth_callback!=NULL) s->onauth_callback(s,isAuthenticated); 
+                    if (s->onauth_callback!=NULL) s->onauth_callback(s,isAuthenticated);
                     // printf("id is %s",s->id );
                     break;
                     case PUBLISH:
@@ -373,7 +373,7 @@ static int ws_service_callback(
                     }
 
                 }
-                // if (_recv->rid!=-1) 
+                // if (_recv->rid!=-1)
                 // printf("rid is %d",_recv->rid);
                 // if (_recv->cid!=-1)
                 // printf("cid is %d", _recv->cid);
@@ -383,7 +383,7 @@ static int ws_service_callback(
                 // printf("event is %s", _recv->event);
                 // if (_recv->error!=NULL)
                 // printf("error is %s", _recv->error);
-                
+
             }
             if (writeable_flag)
                 destroy_flag = 1;
@@ -393,7 +393,7 @@ static int ws_service_callback(
             // printf(KYEL"[Main Service] On writeable is called. send byebye message\n"RESET);
             websocket_write_back(wsi, (char *)"Byebye! See you later", -1);
             writeable_flag = 1;
-        }    
+        }
             break;
 
         default:
@@ -415,11 +415,11 @@ void _emit_int(char * event,int data){
     json_object *dataobject = json_object_new_int(data);
     json_object_object_add(jobj,"event",eventobject);
     json_object_object_add(jobj,"data",dataobject);
-    // websocket_write_back(wsi, (char *)json_object_to_json_string(jobj), -1);     
+    // websocket_write_back(wsi, (char *)json_object_to_json_string(jobj), -1);
     pthread_t pid;
     pthread_create(&pid, NULL, pthread_routine, (char *)json_object_to_json_string(jobj));
-    pthread_detach(pid); 
-    free(jobj);  
+    pthread_detach(pid);
+    free(jobj);
 }
 
 void _emit_string(char * event,char * data){
@@ -428,11 +428,11 @@ void _emit_string(char * event,char * data){
     json_object *dataobject = json_object_new_string(data);
     json_object_object_add(jobj,"event",eventobject);
     json_object_object_add(jobj,"data",dataobject);
-    // websocket_write_back(wsi, (char *)json_object_to_json_string(jobj), -1);     
+    // websocket_write_back(wsi, (char *)json_object_to_json_string(jobj), -1);
     pthread_t pid;
     pthread_create(&pid, NULL, pthread_routine, (char *)json_object_to_json_string(jobj));
-    pthread_detach(pid);   
-    free(jobj); 
+    pthread_detach(pid);
+    free(jobj);
 
 }
 void _emit_object(char *event,json_object * data){
@@ -440,7 +440,7 @@ void _emit_object(char *event,json_object * data){
     json_object *eventobject = json_object_new_string(event);
     json_object_object_add(jobj,"event",eventobject);
     json_object_object_add(jobj,"data",data);
-    // websocket_write_back(wsi, (char *)json_object_to_json_string(jobj), -1);     
+    // websocket_write_back(wsi, (char *)json_object_to_json_string(jobj), -1);
     pthread_t pid;
     pthread_create(&pid, NULL, pthread_routine, (char *)json_object_to_json_string(jobj));
     pthread_detach(pid);
@@ -463,11 +463,11 @@ void _emit_int_ack(char * event,int data,void (*f)(char * event,json_object *err
     json_object_object_add(jobj,"event",eventobject);
     json_object_object_add(jobj,"data",dataobject);
     json_object_object_add(jobj,"cid",cnt);
-    // websocket_write_back(wsi, (char *)json_object_to_json_string(jobj), -1);     
+    // websocket_write_back(wsi, (char *)json_object_to_json_string(jobj), -1);
     pthread_t pid;
     pthread_create(&pid, NULL, pthread_routine, (char *)json_object_to_json_string(jobj));
     pthread_detach(pid);
-    free(jobj); 
+    free(jobj);
 }
 
 void _emit_string_ack(char * event,char * data,void (*f)(char * event,json_object *error,json_object *data)){
@@ -479,11 +479,11 @@ void _emit_string_ack(char * event,char * data,void (*f)(char * event,json_objec
     json_object_object_add(jobj,"event",eventobject);
     json_object_object_add(jobj,"data",dataobject);
     json_object_object_add(jobj,"cid",cnt);
-    // websocket_write_back(wsi, (char *)json_object_to_json_string(jobj), -1);     
+    // websocket_write_back(wsi, (char *)json_object_to_json_string(jobj), -1);
     pthread_t pid;
     pthread_create(&pid, NULL, pthread_routine, (char *)json_object_to_json_string(jobj));
     pthread_detach(pid);
-    free(jobj); 
+    free(jobj);
 
 }
 
@@ -495,11 +495,11 @@ void _emit_object_ack(char *event,json_object * data,void (*f)(char * event,json
     json_object_object_add(jobj,"event",eventobject);
     json_object_object_add(jobj,"data",data);
     json_object_object_add(jobj,"cid",cnt);
-    // websocket_write_back(wsi, (char *)json_object_to_json_string(jobj), -1);     
+    // websocket_write_back(wsi, (char *)json_object_to_json_string(jobj), -1);
     pthread_t pid;
     pthread_create(&pid, NULL, pthread_routine, (char *)json_object_to_json_string(jobj));
     pthread_detach(pid);
-    free(jobj); 
+    free(jobj);
 }
 
 void _subscribe(char *channelname){
@@ -509,14 +509,14 @@ void _subscribe(char *channelname){
     json_object *channelobject = json_object_new_string(channelname);
     json_object_object_add(jobj,"event",eventobject);
     json_object_object_add(jobj1,"channel",channelobject);
-    json_object_object_add(jobj,"data",jobj1);    
+    json_object_object_add(jobj,"data",jobj1);
     json_object *cnt = json_object_new_int(++counter);
     json_object_object_add(jobj,"cid",cnt);
 
     pthread_t pid;
     pthread_create(&pid, NULL, pthread_routine, (char *)json_object_to_json_string(jobj));
     pthread_detach(pid);
-    free(jobj); 
+    free(jobj);
 }
 
 void _subscribe_ack(char *channelname,void (*f)(char *event,json_object *error,json_object *data)){
@@ -528,13 +528,13 @@ void _subscribe_ack(char *channelname,void (*f)(char *event,json_object *error,j
     hashmap_put(acks, counter,getack(channelname,f));
     json_object_object_add(jobj,"event",eventobject);
     json_object_object_add(jobj1,"channel",channelobject);
-    json_object_object_add(jobj,"data",jobj1);    
+    json_object_object_add(jobj,"data",jobj1);
     json_object_object_add(jobj,"cid",cnt);
 
     pthread_t pid;
     pthread_create(&pid, NULL, pthread_routine, (char *)json_object_to_json_string(jobj));
     pthread_detach(pid);
-    free(jobj); 
+    free(jobj);
 }
 
 void _unsubscribe(char *channelname){
@@ -545,11 +545,11 @@ void _unsubscribe(char *channelname){
     json_object_object_add(jobj,"event",eventobject);
     json_object_object_add(jobj,"data",channelobject);
     json_object_object_add(jobj,"cid",cnt);
-    // websocket_write_back(wsi, (char *)json_object_to_json_string(jobj), -1);     
+    // websocket_write_back(wsi, (char *)json_object_to_json_string(jobj), -1);
     pthread_t pid;
     pthread_create(&pid, NULL, pthread_routine, (char *)json_object_to_json_string(jobj));
     pthread_detach(pid);
-    free(jobj); 
+    free(jobj);
 }
 void _unsubscribe_ack(char *channelname,void (*f)(char * event,json_object *error,json_object *data)){
     json_object * jobj = json_object_new_object();
@@ -560,11 +560,11 @@ void _unsubscribe_ack(char *channelname,void (*f)(char * event,json_object *erro
     json_object_object_add(jobj,"event",eventobject);
     json_object_object_add(jobj,"data",channelobject);
     json_object_object_add(jobj,"cid",cnt);
-    // websocket_write_back(wsi, (char *)json_object_to_json_string(jobj), -1);     
+    // websocket_write_back(wsi, (char *)json_object_to_json_string(jobj), -1);
     pthread_t pid;
     pthread_create(&pid, NULL, pthread_routine, (char *)json_object_to_json_string(jobj));
     pthread_detach(pid);
-    free(jobj); 
+    free(jobj);
 
 }
 
@@ -580,11 +580,11 @@ void _publishint(char *channelname,int data){
     json_object_object_add(jobj,"event",eventobject);
     json_object_object_add(jobj,"data",jobj1);
     json_object_object_add(jobj,"cid",cnt);
-    // websocket_write_back(wsi, (char *)json_object_to_json_string(jobj), -1);     
+    // websocket_write_back(wsi, (char *)json_object_to_json_string(jobj), -1);
     pthread_t pid;
     pthread_create(&pid, NULL, pthread_routine, (char *)json_object_to_json_string(jobj));
-    pthread_detach(pid); 
-    free(jobj);  
+    pthread_detach(pid);
+    free(jobj);
 }
 void _publishstring(char *channelname,char *data){
     json_object * jobj = json_object_new_object();
@@ -598,13 +598,13 @@ void _publishstring(char *channelname,char *data){
     json_object_object_add(jobj,"event",eventobject);
     json_object_object_add(jobj,"data",jobj1);
     json_object_object_add(jobj,"cid",cnt);
-    // websocket_write_back(wsi, (char *)json_object_to_json_string(jobj), -1);     
+    // websocket_write_back(wsi, (char *)json_object_to_json_string(jobj), -1);
     pthread_t pid;
     pthread_create(&pid, NULL, pthread_routine, (char *)json_object_to_json_string(jobj));
-    pthread_detach(pid);   
+    pthread_detach(pid);
     free(jobj);
 }
-void _publishobject(char *channelname,json_object *data){   
+void _publishobject(char *channelname,json_object *data){
 
     json_object * jobj = json_object_new_object();
     json_object *eventobject = json_object_new_string("#publish");
@@ -616,7 +616,7 @@ void _publishobject(char *channelname,json_object *data){
     json_object_object_add(jobj,"event",eventobject);
     json_object_object_add(jobj,"data",jobj1);
     json_object_object_add(jobj,"cid",cnt);
-    // websocket_write_back(wsi, (char *)json_object_to_json_string(jobj), -1);     
+    // websocket_write_back(wsi, (char *)json_object_to_json_string(jobj), -1);
     pthread_t pid;
     pthread_create(&pid, NULL, pthread_routine, (char *)json_object_to_json_string(jobj));
     pthread_detach(pid);
@@ -638,11 +638,11 @@ void _publishint_ack(char *channelname,int data,void (*f)(char * event,json_obje
     json_object_object_add(jobj,"event",eventobject);
     json_object_object_add(jobj,"data",jobj1);
     json_object_object_add(jobj,"cid",cnt);
-    // websocket_write_back(wsi, (char *)json_object_to_json_string(jobj), -1);     
+    // websocket_write_back(wsi, (char *)json_object_to_json_string(jobj), -1);
     pthread_t pid;
     pthread_create(&pid, NULL, pthread_routine, (char *)json_object_to_json_string(jobj));
     pthread_detach(pid);
-    free(jobj); 
+    free(jobj);
 }
 void _publishstring_ack(char *channelname,char *data,void (*f)(char * event,json_object *error,json_object *data)){
 
@@ -658,15 +658,15 @@ void _publishstring_ack(char *channelname,char *data,void (*f)(char * event,json
     json_object_object_add(jobj,"event",eventobject);
     json_object_object_add(jobj,"data",jobj1);
     json_object_object_add(jobj,"cid",cnt);
-    // websocket_write_back(wsi, (char *)json_object_to_json_string(jobj), -1);     
+    // websocket_write_back(wsi, (char *)json_object_to_json_string(jobj), -1);
     pthread_t pid;
     pthread_create(&pid, NULL, pthread_routine, (char *)json_object_to_json_string(jobj));
     pthread_detach(pid);
-    free(jobj); 
+    free(jobj);
 
 }
 void _publishobject_ack(char *channelname,json_object *data,void (*f)(char * event,json_object *error,json_object *data)){
-    
+
     json_object * jobj = json_object_new_object();
     json_object *eventobject = json_object_new_string("#publish");
     json_object * jobj1 = json_object_new_object();
@@ -678,7 +678,7 @@ void _publishobject_ack(char *channelname,json_object *data,void (*f)(char * eve
     json_object_object_add(jobj,"event",eventobject);
     json_object_object_add(jobj,"data",jobj1);
     json_object_object_add(jobj,"cid",cnt);
-    // websocket_write_back(wsi, (char *)json_object_to_json_string(jobj), -1);     
+    // websocket_write_back(wsi, (char *)json_object_to_json_string(jobj), -1);
     pthread_t pid;
     pthread_create(&pid, NULL, pthread_routine, (char *)json_object_to_json_string(jobj));
     pthread_detach(pid);
@@ -749,13 +749,11 @@ void socket_connect()
     sigemptyset(&act.sa_mask);
     sigaction( SIGINT, &act, 0);
 
-
     memset(&info, 0, sizeof info);
+
     info.port = CONTEXT_PORT_NO_LISTEN;
     info.iface = NULL;
     info.protocols = &protocol;
-    info.ssl_cert_filepath = NULL;
-    info.ssl_private_key_filepath = NULL;
     info.http_proxy_address=s->proxy_address;
     info.http_proxy_port=(unsigned int )s->proxy_port;
     // info.extensions = lws_get_internal_extensions();
@@ -774,6 +772,7 @@ void socket_connect()
 
     context = lws_create_context(&info);
 
+
     memset(&i, 0, sizeof(i));
 
     i.port = s->port;
@@ -787,10 +786,10 @@ void socket_connect()
     i.ietf_version_or_minus_one = ietf_version;
     i.client_exts = exts;
 
-    printf(KRED"[Main] context created.\n"RESET);
+    printf(KRED "[Main] context created.\n" RESET);
 
     if (context == NULL) {
-        printf(KRED"[Main] context is NULL.\n"RESET);
+        printf(KRED "[Main] context is NULL.\n" RESET);
         return;
     }
 
@@ -798,15 +797,14 @@ void socket_connect()
     // wsi = lws_client_connect(context, "localhost", 8000, 0,
             // "/socketcluster/", "localhost:8000", NULL,
              // protocol.name, -1);
-
     wsi=lws_client_connect_via_info(&i);
-    
+
     if (wsi == NULL) {
-        printf(KRED"[Main] wsi create error.\n"RESET);
+        printf(KRED "[Main] wsi create error.\n" RESET);
         return;
     }
 
-    printf(KGRN"[Main] wsi create success.\n"RESET);
+    printf(KGRN "[Main] wsi create success.\n" RESET);
 
     // struct pthread_routine_tool tool;
     // tool.wsi = wsi;
@@ -833,4 +831,3 @@ Dependancies : libssl-dev,openssl
 gcc client.c -o client -lpthread -lwebsockets -l json
 
 **/
-
